@@ -40,11 +40,24 @@ def create_book(book: BookCreate):
   cursor.execute('INSERT INTO books (title, author) VALUES (?, ?)', (book.title, book.author))
   connection.commit()
   book_id = cursor.lastrowid
+  new_book = Book(id=book_id, title=book.title, author=book.author)
   connection.close()
-  return book_id
+  return new_book
 
 @app.post('/books/')
 def create_book_endpoint(book: BookCreate):
-  book_id = create_book(book)
-  return {'id': book_id, **book.model_dump()}
+  new_book = create_book(book)
+  return new_book
+
+def find_all_books():
+  connection = create_connection()
+  cursor = connection.cursor()
+  db_results = cursor.execute('SELECT * FROM books')
+  list = [book for book in db_results]
+  return list
+
+@app.get('/books/')
+def read_all_books():
+  books_list = find_all_books()
+  return books_list
 
