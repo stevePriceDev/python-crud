@@ -58,12 +58,12 @@ def find_all_books():
   connection.close()
   return list
 
-@app.get('/books/')
+@app.get('/books')
 def read_all_books():
   books_list = find_all_books()
   return books_list
 
-def find_one_book(id: int):
+def find_one_book(id: str):
   connection = create_connection()
   cursor = connection.cursor()
   book = cursor.execute('SELECT * FROM books WHERE id = ?', (id))
@@ -78,4 +78,15 @@ def read_one_book(id: str):
   book = find_one_book(book_id)
   return book
 
+def delete_book(id: str):
+  connection = create_connection()
+  cursor = connection.cursor()
+  cursor.execute('DELETE FROM books WHERE id = ?', (id))
+  connection.commit()
+  connection.close()
 
+@app.get('/delete/{id}')
+def delete_one_book(id: str):
+  book_id = id
+  delete_book(id)
+  return {"message": "The book has been deleted"}
