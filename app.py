@@ -44,7 +44,7 @@ def create_book(book: BookCreate):
   connection.close()
   return new_book
 
-@app.post('/books/')
+@app.post('/books')
 def create_book_endpoint(book: BookCreate):
   new_book = create_book(book)
   return new_book
@@ -87,6 +87,17 @@ def delete_book(id: str):
 
 @app.get('/delete/{id}')
 def delete_one_book(id: str):
-  book_id = id
   delete_book(id)
   return {"message": "The book has been deleted"}
+
+def update_book(id: str, updates: BookCreate):
+  connection = create_connection()
+  cursor = connection.cursor()
+  cursor.execute(' UPDATE books SET title = ?, author = ? WHERE id = ?', (updates.title, updates.author, id))
+  connection.commit()
+  connection.close()
+
+@app.post('/update/{id}')
+def update_one_book(id: str, updates: BookCreate):
+  updated_book = update_book(id, updates)
+  return "The book was updated"
